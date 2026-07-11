@@ -12,12 +12,25 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Enforce strict phone number check
+        if (user.phoneNumber !== "+919056038595") {
+          await auth.signOut();
+          setUser(null);
+          setLoading(false);
+          router.push("/login");
+          return;
+        }
+      }
+      
       setUser(user);
       setLoading(false);
       
       if (!user && pathname !== "/login") {
         router.push("/login");
+      } else if (user && pathname === "/login") {
+        router.push("/");
       }
     });
 
@@ -42,8 +55,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
 
   // Redirect away from login if already logged in
   if (user && pathname === "/login") {
-    router.push("/");
-    return null;
+    return null; // Will redirect via useEffect
   }
 
   return <>{children}</>;

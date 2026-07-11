@@ -8,7 +8,7 @@ service cloud.firestore {
     }
     
     function isAdmin() {
-      return isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      return isAuthenticated() && request.auth.token.phone_number == '+919056038595';
     }
     
     function isOwner(uid) {
@@ -25,9 +25,9 @@ service cloud.firestore {
 
     // Orders Collection
     match /orders/{orderId} {
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
-      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
-      allow update: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid && request.resource.data.status == 'Cancelled');
+      allow read: if isAdmin();
+      allow create: if true;
+      allow update: if isAdmin();
       allow delete: if isAdmin();
     }
 

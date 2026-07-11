@@ -6,73 +6,87 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { auth } from "@laundry24/firebase";
-import { sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth";
+import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 import { useRouter } from "next/navigation";
+
+// Required for RecaptchaVerifier on window object
+declare global {
+  interface Window {
+    recaptchaVerifier: any;
+  }
+}
+
+const ADMIN_PHONE = "+919056038595";
 
 export default function AdminLogin() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
+  
+  // Auth state
+  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
 
   useEffect(() => {
-    if (isSignInWithEmailLink(auth, window.location.href)) {
-      setIsVerifying(true);
-      let emailForSignIn = window.localStorage.getItem("adminEmailForSignIn");
-      
-      if (!emailForSignIn) {
-        emailForSignIn = window.prompt("Please provide your email for confirmation");
-      }
-      
-      if (emailForSignIn) {
-        signInWithEmailLink(auth, emailForSignIn, window.location.href)
-          .then((result) => {
-            window.localStorage.removeItem("adminEmailForSignIn");
-            router.push("/");
-          })
-          .catch((err) => {
-            setError(err.message);
-            setIsVerifying(false);
-          });
-      }
+    // Initialize RecaptchaVerifier
+    if (typeof window !== "undefined" && !window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible',
+      });
     }
-  }, [router]);
+  }, []);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Strict admin phone validation
+    const cleanPhone = phoneNumber.replace(/\s+/g, '');
+    if (cleanPhone !== ADMIN_PHONE) {
+      setError(`Unauthorized. Only ${ADMIN_PHONE} is allowed to access the admin portal.`);
+      return;
+    }
+
     setLoading(true);
     setError("");
     setMsg("");
     
-    const actionCodeSettings = {
-      url: window.location.origin + '/login',
-      handleCodeInApp: true,
-    };
-    
     try {
-      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-      window.localStorage.setItem("adminEmailForSignIn", email);
-      setMsg("Magic link sent! Check your email to securely log in.");
+      const appVerifier = window.recaptchaVerifier;
+      if (!appVerifier) throw new Error("Recaptcha not initialized");
+      
+      const confirmation = await signInWithPhoneNumber(auth, cleanPhone, appVerifier);
+      setConfirmationResult(confirmation);
+      setShowOtpInput(true);
+      setMsg("OTP sent successfully to your mobile number.");
     } catch (err: any) {
-      setError(err.message || "Failed to send login link.");
+      console.error(err);
+      setError(err.message || "Failed to send OTP. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (isVerifying) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-4 border-gray-300 border-t-black rounded-full animate-spin mx-auto"></div>
-          <h2 className="text-2xl font-bold">Verifying Magic Link...</h2>
-          <p className="text-gray-500">Please wait while we log you into the admin panel.</p>
-        </div>
-      </div>
-    );
-  }
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!confirmationResult) return;
+    
+    setLoading(true);
+    setError("");
+    
+    try {
+      await confirmationResult.confirm(otp);
+      // Successful login will trigger AdminGuard to redirect to /
+      router.push("/");
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Invalid OTP. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-50/50 dark:from-black dark:via-emerald-950/10 dark:to-black flex flex-col items-center justify-center p-4 relative overflow-hidden">
@@ -85,29 +99,58 @@ export default function AdminLogin() {
           <CardTitle className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-500 dark:from-white dark:to-gray-400">
             Admin Portal
           </CardTitle>
-          <CardDescription>Enter your admin email to receive a magic login link.</CardDescription>
+          <CardDescription>
+            {showOtpInput ? "Enter the OTP sent to your phone." : "Secure login via Phone OTP."}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {error && <div className="p-3 mb-4 text-sm text-red-500 bg-red-50 dark:bg-red-950/30 rounded-lg">{error}</div>}
           {msg && <div className="p-3 mb-4 text-sm text-green-600 bg-green-50 dark:bg-green-950/30 rounded-lg">{msg}</div>}
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2 text-left">
-              <Label htmlFor="email">Admin Email Address</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="admin@lightningfastlaundry.com" 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-                required 
-              />
-            </div>
+          {!showOtpInput ? (
+            <form onSubmit={handleSendOtp} className="space-y-4">
+              <div className="space-y-2 text-left">
+                <Label htmlFor="phone">Admin Mobile Number</Label>
+                <Input 
+                  id="phone" 
+                  type="tel" 
+                  placeholder="+91 90560 38595" 
+                  value={phoneNumber} 
+                  onChange={e => setPhoneNumber(e.target.value)} 
+                  required 
+                />
+              </div>
 
-            <Button type="submit" disabled={loading} className="w-full bg-black hover:bg-gray-800 text-white dark:bg-white dark:text-black">
-              {loading ? "Sending link..." : "Send Magic Link"}
-            </Button>
-          </form>
+              <div id="recaptcha-container"></div>
+
+              <Button type="submit" disabled={loading} className="w-full bg-black hover:bg-gray-800 text-white dark:bg-white dark:text-black">
+                {loading ? "Sending OTP..." : "Send OTP"}
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyOtp} className="space-y-4">
+              <div className="space-y-2 text-left">
+                <Label htmlFor="otp">6-Digit OTP</Label>
+                <Input 
+                  id="otp" 
+                  type="text" 
+                  placeholder="123456" 
+                  value={otp} 
+                  onChange={e => setOtp(e.target.value)} 
+                  required 
+                  maxLength={6}
+                />
+              </div>
+
+              <Button type="submit" disabled={loading} className="w-full bg-black hover:bg-gray-800 text-white dark:bg-white dark:text-black">
+                {loading ? "Verifying..." : "Verify & Login"}
+              </Button>
+              
+              <Button type="button" variant="ghost" className="w-full mt-2" onClick={() => setShowOtpInput(false)}>
+                Use a different number
+              </Button>
+            </form>
+          )}
         </CardContent>
       </Card>
     </div>
