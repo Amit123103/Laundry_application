@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "deploy": "cloudflare build && cloudflare deploy",
-    "preview": "cloudflare build && cloudflare preview"
+    "deploy": "cloudflare",
+    "preview": "cloudflare && wrangler pages dev .open-next/cloudflare"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
