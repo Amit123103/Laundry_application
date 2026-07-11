@@ -48,23 +48,23 @@ export default function Home() {
       {/* Navbar */}
       <header className="fixed top-0 w-full z-50 border-b bg-white/70 backdrop-blur-xl dark:bg-slate-950/70 dark:border-white/10 transition-all shadow-sm">
         <div className="container mx-auto px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-extrabold text-2xl tracking-tighter text-blue-700 hover:scale-105 transition-transform">
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white shadow-md">
+          <Link href="/" className="flex items-center gap-2 font-extrabold text-2xl tracking-tighter text-emerald-700 hover:scale-105 transition-transform">
+            <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-emerald-600 text-white shadow-md">
               <Droplet className="w-5 h-5 absolute" />
               <Zap className="w-3 h-3 text-yellow-400 absolute fill-yellow-400" />
             </div>
             LightningFast <span className="text-gray-500 font-light">Laundry</span>
           </Link>
           <nav className="hidden md:flex gap-8 font-medium text-sm">
-            <Link href="#how-it-works" className="hover:text-blue-600 transition-colors">How it works</Link>
-            <Link href="#pricing" className="hover:text-blue-600 transition-colors">Pricing</Link>
-            <Link href="#testimonials" className="hover:text-blue-600 transition-colors">Testimonials</Link>
-            <Link href="#faq" className="hover:text-blue-600 transition-colors">FAQ</Link>
-            <Link href="#poster" className="hover:text-blue-600 transition-colors">Poster</Link>
+            <Link href="#how-it-works" className="hover:text-emerald-600 transition-colors">How it works</Link>
+            <Link href="#pricing" className="hover:text-emerald-600 transition-colors">Pricing</Link>
+            <Link href="#testimonials" className="hover:text-emerald-600 transition-colors">Testimonials</Link>
+            <Link href="#faq" className="hover:text-emerald-600 transition-colors">FAQ</Link>
+            <Link href="#poster" className="hover:text-emerald-600 transition-colors">Poster</Link>
           </nav>
           <div className="flex gap-4 items-center">
             <Link href="/booking">
-              <Button className="rounded-full px-6 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30 transition-transform hover:scale-105">
+              <Button className="rounded-full px-6 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/30 transition-transform hover:scale-105">
                 Book Now
               </Button>
             </Link>
