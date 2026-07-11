@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview"
+    "deploy": "cloudflare build && cloudflare deploy",
+    "preview": "cloudflare build && cloudflare preview"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
