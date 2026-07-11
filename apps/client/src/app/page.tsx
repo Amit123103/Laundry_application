@@ -118,7 +118,7 @@ export default function Home() {
             </motion.h1>
             
             <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-gray-500 dark:text-gray-400 max-w-2xl font-light">
-              Get your clothes back pristine and fresh in under 24 hours. Premium care for your garments with Apple-level convenience.
+              We wash, dry, and fold your clothes so you don't have to. Get them back fresh and clean in under 24 hours!
             </motion.p>
             
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 mt-4 w-full sm:w-auto">
@@ -184,7 +184,7 @@ export default function Home() {
             >
               <motion.div variants={fadeInUp}>
                 <h2 className="text-4xl font-bold tracking-tight mb-4">How It Works</h2>
-                <p className="text-gray-500 text-lg mb-10">Three simple steps to fresh clothes without ever leaving your home.</p>
+                <p className="text-gray-500 text-lg mb-10">Just 3 easy steps to get clean clothes delivered right to your door.</p>
                 
                 <div className="space-y-8">
                   {[
@@ -218,7 +218,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-8">
                   <div className="text-white">
                     <p className="font-bold text-xl mb-1">Pristine Care</p>
-                    <p className="text-white/80">Every garment is handled with perfection.</p>
+                    <p className="text-white/80">We treat your clothes like our own.</p>
                   </div>
                 </div>
               </motion.div>
@@ -235,8 +235,8 @@ export default function Home() {
             variants={staggerContainer}
           >
             <motion.div className="text-center max-w-3xl mx-auto mb-16" variants={fadeInUp}>
-              <h2 className="text-4xl font-bold tracking-tight mb-4">Transparent Pricing</h2>
-              <p className="text-gray-500 text-lg">No hidden fees, just sparkling clean clothes.</p>
+              <h2 className="text-4xl font-bold tracking-tight mb-4">Simple Pricing</h2>
+              <p className="text-gray-500 text-lg">No surprises, just fair prices for clean clothes.</p>
             </motion.div>
             
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
@@ -297,8 +297,8 @@ export default function Home() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
                   <div className="text-white max-w-xl">
-                    <p className="font-bold text-3xl mb-2">The Dry Cleaning Experts</p>
-                    <p className="text-white/80 text-lg">Entrust us with your most valuable and delicate fabrics. Our state-of-the-art facilities ensure they are treated with the utmost care.</p>
+                    <p className="font-bold text-3xl mb-2">Professional Dry Cleaning</p>
+                    <p className="text-white/80 text-lg">Got special clothes? We take extra care of your suits, dresses, and delicate fabrics so they look brand new.</p>
                   </div>
                 </div>
             </motion.div>
@@ -314,8 +314,8 @@ export default function Home() {
             variants={staggerContainer}
           >
             <motion.div className="text-center max-w-3xl mx-auto mb-16" variants={fadeInUp}>
-              <h2 className="text-4xl font-bold tracking-tight mb-4">Loved by Customers</h2>
-              <p className="text-gray-500 text-lg">Don't just take our word for it.</p>
+              <h2 className="text-4xl font-bold tracking-tight mb-4">What Our Customers Say</h2>
+              <p className="text-gray-500 text-lg">Here's why people love our service.</p>
             </motion.div>
             
             <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -378,8 +378,8 @@ export default function Home() {
             variants={staggerContainer}
           >
             <motion.div className="text-center max-w-3xl mx-auto mb-12" variants={fadeInUp}>
-              <h2 className="text-4xl font-bold tracking-tight mb-4">Spread the Word</h2>
-              <p className="text-gray-500 text-lg">Download our promotional poster and share it with your friends!</p>
+              <h2 className="text-4xl font-bold tracking-tight mb-4">Tell Your Friends</h2>
+              <p className="text-gray-500 text-lg">Download our poster and help us spread the word!</p>
             </motion.div>
 
             <motion.div variants={fadeInUp} className="flex flex-col items-center gap-8">
@@ -410,7 +410,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left mb-8">
             <div>
               <h3 className="font-bold text-lg text-emerald-900 dark:text-emerald-100 mb-4">LightningFast Laundry</h3>
-              <p className="text-gray-500">Get your clothes back pristine and fresh in under 24 hours. Premium care for your garments.</p>
+              <p className="text-gray-500">We wash, dry, and fold your clothes so you don't have to. Get them back fresh and clean in under 24 hours!</p>
             </div>
             <div>
               <h3 className="font-bold text-lg text-emerald-900 dark:text-emerald-100 mb-4">Contact Us</h3>
