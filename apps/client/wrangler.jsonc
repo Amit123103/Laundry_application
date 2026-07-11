@@ -8,5 +8,14 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "pages_build_output_dir": ".open-next/cloudflare"
+  "pages_build_output_dir": ".open-next/cloudflare",
+  "vars": {
+    "NEXT_PUBLIC_FIREBASE_API_KEY": "AIzaSyAdp_6K7hhBQiqvzC49OrkKbYYDPgLTCnI",
+    "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN": "lightingfastlaundry.firebaseapp.com",
+    "NEXT_PUBLIC_FIREBASE_PROJECT_ID": "lightingfastlaundry",
+    "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET": "lightingfastlaundry.firebasestorage.app",
+    "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "724425779499",
+    "NEXT_PUBLIC_FIREBASE_APP_ID": "1:724425779499:web:7911325c636359f3c2bd6e",
+    "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID": "G-S09K2TXVM0"
+  }
 }
