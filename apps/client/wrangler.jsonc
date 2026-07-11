@@ -8,7 +8,17 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "pages_build_output_dir": ".open-next/cloudflare",
+  "main": ".open-next/worker.js",
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "lightingfast"
+    }
+  ],
   "vars": {
     "NEXT_PUBLIC_FIREBASE_API_KEY": "AIzaSyAdp_6K7hhBQiqvzC49OrkKbYYDPgLTCnI",
     "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN": "lightingfastlaundry.firebaseapp.com",
