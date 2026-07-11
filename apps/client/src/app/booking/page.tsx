@@ -55,7 +55,7 @@ function BookingWizardContent() {
   };
 
   const generateWhatsAppLink = () => {
-    const phone = "919876543210"; // Owner phone
+    const phone = "919056038595"; // Owner phone
     const orderDate = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
     
     const text = `*New Order Alert - LightningFast Laundry* 🚀
