@@ -1,8 +1,45 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IndianRupee, ShoppingBag, Users, Clock } from "lucide-react";
+import { IndianRupee, ShoppingBag, Users, Clock, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { db } from "@laundry24/firebase";
+import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+
+interface Order {
+  id: string;
+  orderNumber: string;
+  customer: string;
+  date: string;
+  total: number;
+  status: string;
+}
 
 export default function Dashboard() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedOrders = snapshot.docs.map(doc => ({
+        id: doc.id,
+        orderNumber: doc.data().orderNumber || doc.id,
+        customer: doc.data().customer || "Unknown",
+        date: doc.data().createdAt?.toDate().toLocaleDateString() || "Today",
+        total: doc.data().total || 450,
+        status: doc.data().status || "Pending"
+      }));
+      setOrders(fetchedOrders);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
+  const pendingCount = orders.filter(o => o.status === "Pending").length;
+  const uniqueCustomers = new Set(orders.map(o => o.customer)).size;
   return (
     <div className="flex flex-col gap-8 relative z-10">
       
@@ -26,7 +63,7 @@ export default function Dashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-black mb-1">₹15,231</div>
+            {loading ? <Loader2 className="w-6 h-6 animate-spin text-gray-400" /> : <div className="text-3xl font-black mb-1">₹{totalRevenue.toLocaleString('en-IN')}</div>}
             <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 font-medium">
               +20.1% this month
             </Badge>
@@ -41,7 +78,7 @@ export default function Dashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-black mb-1">+124</div>
+            {loading ? <Loader2 className="w-6 h-6 animate-spin text-gray-400" /> : <div className="text-3xl font-black mb-1">{orders.length}</div>}
             <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 font-medium">
               +19% from yesterday
             </Badge>
@@ -56,7 +93,7 @@ export default function Dashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-black mb-1">1,402</div>
+            {loading ? <Loader2 className="w-6 h-6 animate-spin text-gray-400" /> : <div className="text-3xl font-black mb-1">{uniqueCustomers}</div>}
             <p className="text-xs text-gray-500 font-medium mt-2">+104 this week</p>
           </CardContent>
         </Card>
@@ -69,7 +106,7 @@ export default function Dashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-black mb-1">14</div>
+            {loading ? <Loader2 className="w-6 h-6 animate-spin text-gray-400" /> : <div className="text-3xl font-black mb-1">{pendingCount}</div>}
             <Badge variant="destructive" className="bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 font-medium shadow-none">
               Requires assignment
             </Badge>
@@ -94,20 +131,27 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
-              {[1,2,3,4,5].map((i) => (
-                <div key={i} className="flex items-center gap-4 group">
-                  <div className="h-10 w-10 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 text-sm font-bold group-hover:scale-110 transition-transform">
-                    LD
+              {loading ? (
+                <div className="flex justify-center p-4"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>
+              ) : orders.length === 0 ? (
+                <div className="text-gray-500 text-sm">No orders yet.</div>
+              ) : (
+                orders.slice(0, 5).map((order) => (
+                  <div key={order.id} className="flex items-center gap-4 group">
+                    <div className="h-10 w-10 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 text-sm font-bold group-hover:scale-110 transition-transform">
+                      {order.customer.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="grid gap-1">
+                      <p className="text-sm font-bold leading-none">{order.customer}</p>
+                      <p className="text-xs text-gray-500 font-medium">{order.orderNumber}</p>
+                    </div>
+                    <div className="ml-auto font-bold text-gray-900 dark:text-white flex items-center gap-4">
+                      <Badge variant="outline">{order.status}</Badge>
+                      <span>₹{order.total}</span>
+                    </div>
                   </div>
-                  <div className="grid gap-1">
-                    <p className="text-sm font-bold leading-none">Rahul Sharma</p>
-                    <p className="text-xs text-gray-500 font-medium">LD2400{i+20}</p>
-                  </div>
-                  <div className="ml-auto font-bold text-gray-900 dark:text-white">
-                    +₹{1200 + i*150}
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>

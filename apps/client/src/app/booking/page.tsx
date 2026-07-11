@@ -1,20 +1,25 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, ArrowRight, ArrowLeft, Send } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { CheckCircle2, ArrowRight, ArrowLeft, Send, Loader2 } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { db } from "@laundry24/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 function BookingWizardContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const preSelectedService = searchParams.get("service");
 
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const totalSteps = 4;
   
   // Form State
@@ -75,6 +80,32 @@ function BookingWizardContent() {
 
 Please confirm this order!`;
     return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      await addDoc(collection(db, "orders"), {
+        orderNumber,
+        customer: fullName,
+        mobileNumber,
+        addressType,
+        fullAddress,
+        pickupTime,
+        deliverySpeed,
+        services,
+        total: 450,
+        status: "Pending",
+        createdAt: serverTimestamp()
+      });
+      alert("Order placed successfully!");
+      router.push("/");
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      alert("Failed to place order. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -268,11 +299,13 @@ Please confirm this order!`;
               Next <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           ) : (
-            <a href={generateWhatsAppLink()} target="_blank" rel="noopener noreferrer">
-              <Button className="bg-[#25D366] hover:bg-[#128C7E] text-white">
-                Confirm & Send <Send className="w-4 h-4 ml-2" />
-              </Button>
-            </a>
+            <Button onClick={handleSubmit} disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700 text-white">
+              {isSubmitting ? (
+                <>Processing... <Loader2 className="w-4 h-4 ml-2 animate-spin" /></>
+              ) : (
+                <>Confirm Booking <CheckCircle2 className="w-4 h-4 ml-2" /></>
+              )}
+            </Button>
           )}
         </CardFooter>
       </Card>
@@ -281,11 +314,47 @@ Please confirm this order!`;
 }
 
 export default function BookingWizard() {
+  const [currentBg, setCurrentBg] = useState(0);
+  
+  const bgImages = [
+    "/laundry_hero_1_1783753042537.png",
+    "/laundry_hero_2_1783753060990.png",
+    "/laundry_hero_3_1783753069996.png",
+    "/laundry_hero_4_1783753078635.png",
+    "/laundry_hero_5_1783753092638.png",
+    "/laundry_hero_6_1783753102227.png",
+    "/laundry_hero_7_1783753111937.png",
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBg((prev) => (prev + 1) % bgImages.length);
+    }, 1250);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="min-h-screen pt-24 pb-12 bg-gray-50 dark:bg-zinc-950 flex flex-col items-center">
-      <Suspense fallback={<div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />}>
-        <BookingWizardContent />
-      </Suspense>
+    <div className="relative min-h-screen pt-24 pb-12 flex flex-col items-center">
+      {/* Background Slideshow */}
+      <div className="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none">
+        {bgImages.map((src, index) => (
+          <Image 
+            key={src}
+            src={src}
+            alt="Laundry Background"
+            fill
+            priority={index === 0}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 scale-105 pointer-events-none ${index === currentBg ? "opacity-60 dark:opacity-70" : "opacity-0"}`}
+          />
+        ))}
+        <div className="absolute inset-0 bg-white/60 dark:bg-black/70 pointer-events-none" />
+      </div>
+
+      <div className="relative z-10 w-full flex justify-center">
+        <Suspense fallback={<div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />}>
+          <BookingWizardContent />
+        </Suspense>
+      </div>
     </div>
   );
 }

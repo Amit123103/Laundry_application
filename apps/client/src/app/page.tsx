@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -23,11 +24,30 @@ const staggerContainer: Variants = {
 };
 
 export default function Home() {
+  const [currentBg, setCurrentBg] = useState(0);
+  
+  const bgImages = [
+    "/laundry_hero_1_1783753042537.png",
+    "/laundry_hero_2_1783753060990.png",
+    "/laundry_hero_3_1783753069996.png",
+    "/laundry_hero_4_1783753078635.png",
+    "/laundry_hero_5_1783753092638.png",
+    "/laundry_hero_6_1783753102227.png",
+    "/laundry_hero_7_1783753111937.png",
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBg((prev) => (prev + 1) % bgImages.length);
+    }, 1250);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-50/50 dark:from-black dark:via-emerald-950/10 dark:to-black overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50/50 via-white to-blue-50/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
       {/* Navbar */}
-      <header className="fixed top-0 w-full z-50 border-b bg-gradient-to-r from-emerald-100/90 via-white/90 to-emerald-50/90 backdrop-blur-xl dark:from-emerald-950/60 dark:via-black/60 dark:to-emerald-900/60 dark:border-white/10 transition-all">
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+      <header className="fixed top-0 w-full z-50 border-b bg-white/70 backdrop-blur-xl dark:bg-slate-950/70 dark:border-white/10 transition-all shadow-sm">
+        <div className="container mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 font-extrabold text-2xl tracking-tighter text-blue-700 hover:scale-105 transition-transform">
             <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white shadow-md">
               <Droplet className="w-5 h-5 absolute" />
@@ -52,22 +72,23 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-grow pt-20">
+      <main className="flex-grow pt-14">
         {/* Hero Section */}
         <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-          {/* Background Video */}
+          {/* Background Slideshow */}
           <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
-            <video 
-              autoPlay 
-              loop 
-              muted 
-              playsInline 
-              className="absolute inset-0 w-full h-full object-cover opacity-30 dark:opacity-40 scale-105 pointer-events-none"
-            >
-              <source src="https://assets.mixkit.co/videos/preview/mixkit-washing-machine-cleaning-clothes-26691-large.mp4" type="video/mp4" />
-            </video>
+            {bgImages.map((src, index) => (
+              <Image 
+                key={src}
+                src={src}
+                alt="Laundry Background"
+                fill
+                priority={index === 0}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 scale-105 pointer-events-none ${index === currentBg ? "opacity-80 dark:opacity-90" : "opacity-0"}`}
+              />
+            ))}
             {/* Gradient Overlay to ensure text readability */}
-            <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-emerald-50/70 to-white/95 dark:from-black/90 dark:via-emerald-950/60 dark:to-black/95 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/50 to-white/95 dark:from-black/80 dark:via-black/60 dark:to-black/95 pointer-events-none" />
           </div>
           
           {/* Background Gradients */}
@@ -124,6 +145,32 @@ export default function Home() {
             </motion.div>
           </motion.div>
         </section>
+
+        {/* Scrolling Services Marquee */}
+        <div className="w-full bg-white dark:bg-black border-y border-gray-100 dark:border-gray-800 overflow-hidden py-4 flex items-center relative z-10">
+          <div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="flex shrink-0 items-center gap-12 px-6">
+                {[
+                  { name: "Wash & Fold", icon: "👕" },
+                  { name: "Dry Cleaning", icon: "👔" },
+                  { name: "Ironing", icon: "✨" },
+                  { name: "Stain Removal", icon: "🧼" },
+                  { name: "Shoe Cleaning", icon: "👟" },
+                  { name: "Leather Care", icon: "👜" },
+                  { name: "Express 24h Delivery", icon: "⚡" },
+                ].map((service, index) => (
+                  <div key={`${i}-${index}`} className="flex items-center gap-2">
+                    <span className="text-2xl">{service.icon}</span>
+                    <span className="text-lg font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                      {service.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Why Choose Us & Image Showcase */}
         <section id="how-it-works" className="py-24 bg-emerald-50/50 dark:bg-emerald-950/20 backdrop-blur-sm">
@@ -358,9 +405,39 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="bg-white/80 dark:bg-black/80 backdrop-blur-md border-t border-emerald-100 dark:border-emerald-900/30 py-12">
-        <div className="container mx-auto px-6 text-center text-gray-500">
-          <p>&copy; {new Date().getFullYear()} LightningFast Laundry. All rights reserved.</p>
+      <footer className="bg-white/80 dark:bg-black/80 backdrop-blur-md border-t border-emerald-100 dark:border-emerald-900/30 py-12 mt-auto">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left mb-8">
+            <div>
+              <h3 className="font-bold text-lg text-emerald-900 dark:text-emerald-100 mb-4">LightningFast Laundry</h3>
+              <p className="text-gray-500">Get your clothes back pristine and fresh in under 24 hours. Premium care for your garments.</p>
+            </div>
+            <div>
+              <h3 className="font-bold text-lg text-emerald-900 dark:text-emerald-100 mb-4">Contact Us</h3>
+              <p className="text-gray-500 font-medium">Owner: Gora Khatri</p>
+              <p className="text-gray-500 font-bold text-blue-600 dark:text-blue-400 mt-1">📞 +91 90560 38595</p>
+            </div>
+            <div>
+              <h3 className="font-bold text-lg text-emerald-900 dark:text-emerald-100 mb-4">Location</h3>
+              <p className="text-gray-500 font-medium flex items-center justify-center md:justify-start gap-2">
+                📍 Lawgate
+              </p>
+            </div>
+          </div>
+          <div className="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 gap-4">
+            <p>&copy; {new Date().getFullYear()} LightningFast Laundry. All rights reserved.</p>
+            <p className="text-sm">
+              Developed by{" "}
+              <a 
+                href="https://amit123103.github.io/SmartPortfolio/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline transition-all"
+              >
+                Amit Kumar
+              </a>
+            </p>
+          </div>
         </div>
       </footer>
     </div>
