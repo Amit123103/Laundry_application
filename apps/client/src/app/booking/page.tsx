@@ -98,7 +98,11 @@ Please confirm this order!`;
         status: "Pending",
         createdAt: serverTimestamp()
       });
-      alert("Order placed successfully!");
+      
+      // Open WhatsApp to send the message perfectly to 9056038595
+      window.open(generateWhatsAppLink(), "_blank");
+      
+      alert("Order placed successfully! You will be redirected to WhatsApp to confirm.");
       router.push("/");
     } catch (error) {
       console.error("Error adding document: ", error);
