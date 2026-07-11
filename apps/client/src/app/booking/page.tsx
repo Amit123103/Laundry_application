@@ -186,7 +186,7 @@ Please confirm this order!`;
               </div>
               <div className="space-y-2">
                 <Label>Address Area <span className="text-red-500">*</span></Label>
-                <Select value={addressType} onValueChange={setAddressType}>
+                <Select value={addressType} onValueChange={(val) => setAddressType(val || "")}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select Area" />
                   </SelectTrigger>
